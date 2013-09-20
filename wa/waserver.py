@@ -8,6 +8,7 @@ waeo = wap.WolframAlphaEngine(appid, wa_url)
 query_stub = 'nutritional information of '
 
 conn = sqlite3.connect('cache.db')
+conn.text_factory = str
 cursor = conn.cursor()
 try:
 	cursor.execute('CREATE TABLE cache (query text, response text)')
@@ -27,13 +28,12 @@ def run_query(input_query):
 	else:
 		print "	Cache miss on: %s" % (input_query)
 		query = waeo.CreateQuery(input_query)
-		print '1'
 		response = waeo.PerformQuery(query)
-		print '2'
-		cursor.execute('INSERT INTO cache VALUES (?, ?)', (input_query, response,))
-		print '3'
+		try:
+			cursor.execute('INSERT INTO cache VALUES (?, ?)', (input_query, response,))
+		except sqlite3.Error as e:
+			print "Error occurred: %s" % (e.args[0])
 		conn.commit()
-		print '4'
 	
 	output_json = xmltodict.parse(response)
 	return jsonify(output_json)
