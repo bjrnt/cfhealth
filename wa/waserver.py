@@ -22,12 +22,18 @@ def run_query(input_query):
 	response = cursor.fetchone()
 
 	if response:
+		print "	Cache hit on: %s" % (input_query)
 		response = response[0]
 	else:
-		query = waeo.CreateQuery(input_query)	
+		print "	Cache miss on: %s" % (input_query)
+		query = waeo.CreateQuery(input_query)
+		print '1'
 		response = waeo.PerformQuery(query)
+		print '2'
 		cursor.execute('INSERT INTO cache VALUES (?, ?)', (input_query, response,))
+		print '3'
 		conn.commit()
+		print '4'
 	
 	output_json = xmltodict.parse(response)
 	return jsonify(output_json)
