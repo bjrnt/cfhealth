@@ -13,9 +13,12 @@
 <h4 ng-bind-template="History"></h4>
 	<hr>
 	<ul>
-	<li ng-repeat="item in items">
-	{{ item.description }}
-	</li>
+		<li ng-repeat="item in items">
+			{{ item.description.toLowerCase() }}
+			<ul>
+			<li ng-repeat="value in item.values">{{ value.name }} {{ value.value }}%</li>
+			</ul>
+		</li>
 	</ul>
 </div>
 

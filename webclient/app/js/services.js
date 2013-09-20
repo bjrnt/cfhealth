@@ -11,39 +11,66 @@ servicesModule.value('version', '0.1');
 
 servicesModule.factory('Nutrition', function($http) {
 	var url = "http://localhost:8080/wa?callback=JSON_CALLBACK&item=";
-  	var obj = {};
-  	obj.get = function (item) {
-  		var promise = $http.jsonp(url + item).then(
-  			function (response) {
-	  			var data = response.data;
-	  			if(data['queryresult'] != undefined) {
-		  			for(var i=0; i < data.queryresult.pod.length; i++) {
-		  				if(data.queryresult.pod[i]['@title'] == "Nutrition facts") {
-		  					var result = new String(data.queryresult.pod[i].subpod.plaintext);
-						}
-		  			}
-		  		}
-		  		else {
-		  			result = '';
-		  		}
-	  			return result;
-  			});
-  		return promise;
-  	};
-  	return obj;
+	var ret = {};
+	ret.get = function (item) {
+		var promise = $http.jsonp(url + item).then(function (response) {
+			var data = response.data;
+			if(data.queryresult !== undefined) {
+				for(var i=0; i < data.queryresult.pod.length; i++) {
+					/* WARNING: UGLIEST DATA PROCESSING IN HISTORY */
+					if(data.queryresult.pod[i]['@title'] == "Nutrition facts" ||
+						data.queryresult.pod[i]['@title'] == "Average nutrition facts") {
+						var nutrients = [];
+						var result = data.queryresult.pod[i].subpod.plaintext
+					.replace(/\% daily value\^\* \|\s+/g, '')
+					.replace(/\s*[0-9]+ [m]?g\s*/g, '')
+					.replace(/\s*\|/g, '');
+						
+						result = result.split('\n');
+						result = result.splice(1, result.length - 3);
+						for (var i = result.length - 1; i >= 0; i--) {
+							result[i] = result[i].replace(/(^\s+|\s+$)/g, '');
+							if(result[i][result[i].length - 1] != '%') {
+								result.splice(i,1);
+								continue;
+							}
+
+							var subresult = result[i].split(/\%\s+/);
+							if(subresult.length > 1) {
+								subresult[0] += '%';
+								result = result.concat(subresult);
+								result.splice(i,1);
+							}
+						};
+
+						for (var i = result.length - 1; i >= 0; i--) {
+							var value = result[i].match(/[0-9]+\%/);
+							var name = result[i].match(/[A-Za-z ]+/);	
+							nutrients.push({'name': name[0].trim(), 'value': value[0].substring(0, value[0].length - 1)});				
+						};
+
+						return nutrients;
+				}
+			}
+		}
+		return 'PROBLEM';
+	});
+		return promise;
+	};
+	return ret;
 });
 
 servicesModule.factory('Phridge', function($http) {
 	var url = "http://pororo.kaist.ac.kr/phridge/items/?callback=JSON_CALLBACK&id=";
-  	var obj = {};
-  	obj.get = function (id) {
-  		var promise = $http.jsonp(url + id).then(
-  			function (response) {
-  				var data = response.data;
-  				console.log(data);
-  				return data;
-  			});
-  		return promise;
-  	};
-  	return obj;
+		var obj = {};
+		obj.get = function (id) {
+			var promise = $http.jsonp(url + id).then(
+				function (response) {
+					var data = response.data;
+					console.log(data);
+					return data;
+				});
+			return promise;
+		};
+		return obj;
 });
