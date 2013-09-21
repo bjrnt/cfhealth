@@ -10,7 +10,7 @@ var servicesModule = angular.module('myApp.services', []);
 servicesModule.value('version', '0.1');
 
 servicesModule.factory('Nutrition', function($http) {
-	var url = "http://localhost:8080/wa?callback=JSON_CALLBACK&item=";
+	var url = "http://192.168.0.25:8080/wa?callback=JSON_CALLBACK&item=";
 	var ret = {};
 	ret.get = function (item) {
 		var promise = $http.jsonp(url + item).then(function (response) {
@@ -21,10 +21,12 @@ servicesModule.factory('Nutrition', function($http) {
 					if(data.queryresult.pod[i]['@title'] == "Nutrition facts" ||
 						data.queryresult.pod[i]['@title'] == "Average nutrition facts") {
 						var nutrients = [];
-						var result = data.queryresult.pod[i].subpod.plaintext
-					.replace(/\% daily value\^\* \|\s+/g, '')
-					.replace(/\s*[0-9]+ [m]?g\s*/g, '')
-					.replace(/\s*\|/g, '');
+						var result = data.queryresult.pod[i].subpod.plaintext;
+						var calories = result.match(/total calories\s+([0-9]+)/)[1];
+						result = result
+						.replace(/\% daily value\^\* \|\s+/g, '')
+						.replace(/\s*[0-9]+ [m]?g\s*/g, '')
+						.replace(/\s*\|/g, '');
 						
 						result = result.split('\n');
 						result = result.splice(1, result.length - 3);
@@ -48,6 +50,7 @@ servicesModule.factory('Nutrition', function($http) {
 							var name = result[i].match(/[A-Za-z ]+/);	
 							nutrients.push({'name': name[0].trim(), 'value': value[0].substring(0, value[0].length - 1)});				
 						};
+						nutrients.push({'name': 'total calories', 'value': calories});
 
 						return nutrients;
 				}
