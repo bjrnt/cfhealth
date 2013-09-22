@@ -15,7 +15,7 @@ servicesModule.factory('Nutrition', function($http) {
 	ret.get = function (item) {
 		var promise = $http.jsonp(url + item).then(function (response) {
 			var data = response.data;
-			if(data.queryresult !== undefined) {
+			if(data.queryresult !== undefined && data.queryresult.pod !== undefined) {
 				for(var i=0; i < data.queryresult.pod.length; i++) {
 					/* WARNING: UGLIEST DATA PROCESSING IN HISTORY */
 					if(data.queryresult.pod[i]['@title'] == "Nutrition facts" ||
@@ -70,7 +70,6 @@ servicesModule.factory('Phridge', function($http) {
 			var promise = $http.jsonp(url + id).then(
 				function (response) {
 					var data = response.data;
-					console.log(data);
 					return data;
 				});
 			return promise;
