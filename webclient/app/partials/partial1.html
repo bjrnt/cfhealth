@@ -15,8 +15,8 @@
 	<div class="row">
 		<div class="col-md-12 col-xs-12">
 			<div class="progress">
-				  <div class="progress-bar {{ barType(calories) }}" role="progressbar" aria-valuenow="{{ calories }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ calories }}%">
-				    <span class="sr-only">{{ calories }}%</span>
+				  <div class="progress-bar {{ barType(calculateCaloriesPercentage(calories)) }}" role="progressbar" aria-valuenow="{{ calculateCaloriesPercentage(calories) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ calculateCaloriesPercentage(calories) }}%">
+				    <span class="sr-only">{{ calculateCaloriesPercentage(calories) }}%</span>
 				  </div>
 		    </div>
 	    </div>
@@ -80,7 +80,7 @@
 <h4 ng-bind-template="History"></h4>
 	<hr>
 	<ul>
-		<li ng-repeat="item in items" style="text-transform: capitalize">
+		<li ng-repeat="item in consumed" style="text-transform: capitalize">
 			<abbr title="{{ item.values }}" class="initialism">{{ item.description.toLowerCase() }}</abbr>
 		</li>
 	</ul>

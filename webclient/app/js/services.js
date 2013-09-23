@@ -56,7 +56,7 @@ servicesModule.factory('Nutrition', function($http) {
 				}
 			}
 		}
-		return 'PROBLEM';
+		return 'PROBLEM EXTRACTING INFO FROM ITEM: ' + item;
 	});
 return promise;
 };
@@ -65,22 +65,19 @@ return ret;
 
 servicesModule.factory('Phridge', function($http) {
 	var obj = {};
-	obj.history = function (id) {
-		var url = "http://pororo.kaist.ac.kr/phridge/items/?callback=JSON_CALLBACK&id=";
-		var promise = $http.jsonp(url + id).then(
-			function (response) {
-				return response.data;
-			});
-		return promise;
+	
+	var getter = function (url) {
+		return function (id) {
+			var promise = $http.jsonp(url + id).then(
+				function (response) {
+					return response.data
+				});
+			return promise;
+		};
 	};
-	obj.current = function (id) {
-		var url = "http://pororo.kaist.ac.kr/phridge/current/?callback=JSON_CALLBACK&id=";
-		var promise = $http.jsonp(url + id).then(
-			function (response) {
-				return response.data;
-		});
-		return promise;
-	};
+
+	obj.history = getter("http://pororo.kaist.ac.kr/phridge/items/?callback=JSON_CALLBACK&id=");
+	obj.current = getter("http://pororo.kaist.ac.kr/phridge/current/?callback=JSON_CALLBACK&id=");
 
 	return obj;
 });

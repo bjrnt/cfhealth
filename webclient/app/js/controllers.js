@@ -8,60 +8,62 @@ function TestController($scope, $location, Nutrition, Phridge) {
 	var phridgeId = $location.search()['id'];
 
 	$scope.daily_calories = 2000;
-	$scope.calories = 0;
-	$scope.protein = 0;
-	$scope.carbohydrates = 0;
-	$scope.fat = 0;
-	$scope.calories = 0; 
 
-	$scope.items = Phridge.history(phridgeId).then(function(items) {
-		for (var i = items.length - 1; i >= 0; i--) {
-			console.log(items[i]);
-			if(items[i].removal == 0 || items[i].description == '') // We're not interested in an item unless it has been taken out
-				items.splice(i,1); 
-			else {
-				items[i].values = Nutrition.get(items[i].title);
-			}
-		};
+	var mainValues = [
+	{attr: 'protein', regex: /protein/i}, 
+	{attr: 'fat', regex: /total fat/i}, 
+	{attr: 'carbohydrates', regex: /total carbohydrates/i}, 
+	{attr: 'calories', regex:/total calories/i}];
 
-		return items;
+	_.each(mainValues, function (value) { $scope[value.attr] = 0; });
+
+	$scope.consumed = Phridge.history(phridgeId).then(function(items) {
+		return _.chain(items)
+		.filter(function (item) { return (item.removal != 0 && item.description != ''); })
+		.map(function (item) { item.values = Nutrition.get(item.title); return item; })
+		.value();
 	});
-			
+
 	$scope.aggregates = function() {
 		var aggregates = {};
-		$scope.items.then(function(items) {
-			for (var i = items.length - 1; i >= 0; i--) {
-				items[i].values.then(function (values) {
-					for (var j = values.length - 1; j >= 0; j--) {
-						if(values[j].name.match(/protein/i)) {
-							$scope.protein += parseInt(values[j].value);
-							continue;
-						}
-						else if(values[j].name.match(/total fat/i)) {
-							$scope.fat += parseInt(values[j].value);
-							continue;
-						}
-						else if(values[j].name.match(/total carbohydrates/i)) {
-							$scope.carbohydrates += parseInt(values[j].value);
-							continue;
-						}
-						else if(values[j].name.match(/total calories/i)) {
-							$scope.calories += parseInt(values[j].value) / $scope.daily_calories * 100;
-							continue;
-						}
+		var regexes = [/protein/i, /total fat/i, /total carbohydrates/i, /total calories/i];
 
+		/* Matches the value against the main values */
+		var matchMain = function (value) {
+			var matches = _.map(mainValues, function (mainValue) { 
+				if(value.name.match(mainValue.regex)) {
+					$scope[mainValue.attr] += parseInt(value.value);
+					return 1;
+				}
+				return 0;
+			});
 
-						if(values[j].name in aggregates) 
-							aggregates[values[j].name] += parseInt(values[j].value);
-						else
-							aggregates[values[j].name] = parseInt(values[j].value);
-					};
-				});
-			}
+			return _.reduce(matches, function (memo, num) { return memo + num; }, 0) == 0;
+		};
+
+		/* Extracts all of the main and normal vaues */
+		var extractValues = function (values) {
+			_.chain(values)
+			.filter(matchMain)
+			.each(function(value) {
+				if(value.name in aggregates) 
+					aggregates[value.name] += parseInt(value.value);
+				else
+					aggregates[value.name] = parseInt(value.value);
+			});
+		};
+
+		$scope.consumed.then(function(items) {
+			_.chain(items)
+			.each(function(item) { item.values.then(extractValues) });
 		});
 		
 		return aggregates;
 	}();
+
+	$scope.calculateCaloriesPercentage = function (calories) {
+		return parseFloat(calories) / parseFloat($scope.daily_calories) * 100;
+	};
 
 	$scope.barType = function(value) {
 		if(value > 130)
