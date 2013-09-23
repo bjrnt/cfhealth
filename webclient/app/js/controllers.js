@@ -37,7 +37,6 @@ function TestController($scope, $location, Nutrition, Phridge) {
 				}
 				return 0;
 			});
-
 			return _.reduce(matches, function (memo, num) { return memo + num; }, 0) == 0;
 		};
 

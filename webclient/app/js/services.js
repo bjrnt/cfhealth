@@ -2,13 +2,12 @@
 
 /* Services */
 
-
-// Demonstrate how to register services
-// In this case it is a simple value service.
 var servicesModule = angular.module('myApp.services', []);
 
 servicesModule.value('version', '0.1');
 
+/* Fix this ugly function. Worst code you've written. Seriously.
+Also, use the getter method below */
 servicesModule.factory('Nutrition', function($http) {
 	var url = "http://192.168.0.25:8080/wa?callback=JSON_CALLBACK&item=";
 	var ret = {};
@@ -56,7 +55,8 @@ servicesModule.factory('Nutrition', function($http) {
 				}
 			}
 		}
-		return 'PROBLEM EXTRACTING INFO FROM ITEM: ' + item;
+		console.log('PROBLEM EXTRACTING INFO FROM ITEM: ' + item + '. TIME TO EXPLODE!!');
+		return {};
 	});
 return promise;
 };
