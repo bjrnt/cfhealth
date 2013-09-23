@@ -12,9 +12,9 @@ function TestController($scope, $location, Nutrition, Phridge) {
 	$scope.protein = 0;
 	$scope.carbohydrates = 0;
 	$scope.fat = 0;
-	$scope.calories = 0;
+	$scope.calories = 0; 
 
-	$scope.items = Phridge.get(phridgeId).then(function(items) {
+	$scope.items = Phridge.history(phridgeId).then(function(items) {
 		for (var i = items.length - 1; i >= 0; i--) {
 			console.log(items[i]);
 			if(items[i].removal == 0 || items[i].description == '') // We're not interested in an item unless it has been taken out

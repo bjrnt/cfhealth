@@ -21,58 +21,66 @@ servicesModule.factory('Nutrition', function($http) {
 					if(data.queryresult.pod[i]['@title'] == "Nutrition facts" ||
 						data.queryresult.pod[i]['@title'] == "Average nutrition facts") {
 						var nutrients = [];
-						var result = data.queryresult.pod[i].subpod.plaintext;
-						var calories = result.match(/total calories\s+([0-9]+)/)[1];
-						result = result
-						.replace(/\% daily value\^\* \|\s+/g, '')
-						.replace(/\s*[0-9]+ [m]?g\s*/g, '')
-						.replace(/\s*\|/g, '');
-						
-						result = result.split('\n');
-						result = result.splice(1, result.length - 3);
-						for (var i = result.length - 1; i >= 0; i--) {
-							result[i] = result[i].replace(/(^\s+|\s+$)/g, '');
-							if(result[i][result[i].length - 1] != '%') {
-								result.splice(i,1);
-								continue;
-							}
+					var result = data.queryresult.pod[i].subpod.plaintext;
+					var calories = result.match(/total calories\s+([0-9]+)/)[1];
+					result = result
+					.replace(/\% daily value\^\* \|\s+/g, '')
+					.replace(/\s*[0-9]+ [m]?g\s*/g, '')
+					.replace(/\s*\|/g, '');
 
-							var subresult = result[i].split(/\%\s+/);
-							if(subresult.length > 1) {
-								subresult[0] += '%';
-								result = result.concat(subresult);
-								result.splice(i,1);
-							}
-						};
+					result = result.split('\n');
+					result = result.splice(1, result.length - 3);
+					for (var i = result.length - 1; i >= 0; i--) {
+						result[i] = result[i].replace(/(^\s+|\s+$)/g, '');
+						if(result[i][result[i].length - 1] != '%') {
+							result.splice(i,1);
+							continue;
+						}
 
-						for (var i = result.length - 1; i >= 0; i--) {
-							var value = result[i].match(/[0-9]+\%/);
-							var name = result[i].match(/[A-Za-z ]+/);	
-							nutrients.push({'name': name[0].trim(), 'value': value[0].substring(0, value[0].length - 1)});				
-						};
-						nutrients.push({'name': 'total calories', 'value': calories});
+						var subresult = result[i].split(/\%\s+/);
+						if(subresult.length > 1) {
+							subresult[0] += '%';
+							result = result.concat(subresult);
+							result.splice(i,1);
+						}
+					};
 
-						return nutrients;
+					for (var i = result.length - 1; i >= 0; i--) {
+						var value = result[i].match(/[0-9]+\%/);
+						var name = result[i].match(/[A-Za-z ]+/);	
+						nutrients.push({'name': name[0].trim(), 'value': value[0].substring(0, value[0].length - 1)});				
+					};
+					nutrients.push({'name': 'total calories', 'value': calories});
+
+					return nutrients;
 				}
 			}
 		}
 		return 'PROBLEM';
 	});
-		return promise;
-	};
-	return ret;
+return promise;
+};
+return ret;
 });
 
 servicesModule.factory('Phridge', function($http) {
-	var url = "http://pororo.kaist.ac.kr/phridge/items/?callback=JSON_CALLBACK&id=";
-		var obj = {};
-		obj.get = function (id) {
-			var promise = $http.jsonp(url + id).then(
-				function (response) {
-					var data = response.data;
-					return data;
-				});
-			return promise;
-		};
-		return obj;
+	var obj = {};
+	obj.history = function (id) {
+		var url = "http://pororo.kaist.ac.kr/phridge/items/?callback=JSON_CALLBACK&id=";
+		var promise = $http.jsonp(url + id).then(
+			function (response) {
+				return response.data;
+			});
+		return promise;
+	};
+	obj.current = function (id) {
+		var url = "http://pororo.kaist.ac.kr/phridge/current/?callback=JSON_CALLBACK&id=";
+		var promise = $http.jsonp(url + id).then(
+			function (response) {
+				return response.data;
+		});
+		return promise;
+	};
+
+	return obj;
 });
