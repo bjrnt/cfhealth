@@ -7,7 +7,7 @@ function TestController($scope, $location, Nutrition, Phridge) {
 	$scope.title = "cfHealth"
 	var phridgeId = $location.search()['id'];
 
-	$scope.daily_calories = 2000;
+	$scope.dailyCalories = 2000;
 
 	var mainValues = [
 	{attr: 'protein', regex: /protein/i}, 
@@ -30,14 +30,16 @@ function TestController($scope, $location, Nutrition, Phridge) {
 
 		/* Matches the value against the main values */
 		var matchMain = function (value) {
-			var matches = _.map(mainValues, function (mainValue) { 
+			return _.chain(mainValues)
+			.map(function (mainValue) { 
 				if(value.name.match(mainValue.regex)) {
 					$scope[mainValue.attr] += parseInt(value.value);
 					return 1;
 				}
 				return 0;
-			});
-			return _.reduce(matches, function (memo, num) { return memo + num; }, 0) == 0;
+			})
+			.reduce(function (memo, num) { return memo + num; }, 0)
+			.value() == 0;
 		};
 
 		/* Extracts all of the main and normal vaues */
@@ -61,7 +63,7 @@ function TestController($scope, $location, Nutrition, Phridge) {
 	}();
 
 	$scope.calculateCaloriesPercentage = function (calories) {
-		return parseFloat(calories) / parseFloat($scope.daily_calories) * 100;
+		return parseFloat(calories) / parseFloat($scope.dailyCalories) * 100;
 	};
 
 	$scope.barType = function(value) {
