@@ -2,13 +2,19 @@
 
 /* Controllers */
 
+// Personalization
+// Recommendation
+// Doughnut chart thing
+// Item != "", images for history
+
 function TestController($scope, $location, Nutrition, Phridge) {
 	$scope.date = new Date(); // Add check of date to see that it was today
-	$scope.title = "cfHealth"
 	var phridgeId = $location.search()['id'];
-
 	$scope.dailyCalories = 2000;
+	$scope.name = "Allison";
 
+	$scope.boxClass = "";
+	//$scope.info = "Here is your progress towards today's recommended daily intake.";
 	var mainValues = [
 	{attr: 'protein', regex: /protein/i}, 
 	{attr: 'fat', regex: /total fat/i}, 
@@ -17,7 +23,7 @@ function TestController($scope, $location, Nutrition, Phridge) {
 
 	_.each(mainValues, function (value) { $scope[value.attr] = 0; });
 
-	$scope.consumed = Phridge.history(phridgeId).then(function(items) {
+	$scope.consumed = Phridge.history(phridgeId).then(function (items) {
 		return _.chain(items)
 		.filter(function (item) { return (item.removal != 0 && item.description != ''); })
 		.map(function (item) { item.values = Nutrition.get(item.title); return item; })
@@ -62,6 +68,37 @@ function TestController($scope, $location, Nutrition, Phridge) {
 		return aggregates;
 	}();
 
+	$scope.recommend = function () {
+		$scope.info = Phridge.current(phridgeId).then(function (items) {
+			console.log(items);
+			_.chain(items)
+			.filter(function (item) {
+				Nutrition.get(item.title).then(function (values) {
+					console.log(values);
+				});
+				return 1;
+			})
+			.value();
+		});
+
+		// if(user picked a good item)
+		if(false) {
+			$scope.boxClass = "alert alert-success";
+			$scope.info = "<span><icon class='icon-thumbs-up icon-2x' style='vertical-align: middle;'></i> </span><span><strong>Good job, " + $scope.name + "!</strong> <b>Milk</b> is exactly what you need, as you're low on <b>calcium</b> today.</span>"	
+		}
+		
+
+		// if(user picked a bad item)
+		if(true) {
+			$scope.boxClass = "alert alert-danger";
+			$scope.info = "<span><icon class='icon-thumbs-down icon-2x' style='vertical-align: middle;'></i> </span><span><strong>Hey, " + $scope.name + "!</strong> <b>Orange juice</b> is a poor dietary choice. You don't need any more <b>carbohydrates</b> or <b>Vitamin C</b> today. How about some <b>milk</b> to get that extra <b>calcium</b>?</span>"	
+		}
+
+		// if(user opened door but didnt take anything out yet, or simply asked for a recommendation)
+		if(false)
+			$scope.boxClass = "alert";
+	};
+
 	$scope.calculateCaloriesPercentage = function (calories) {
 		return parseFloat(calories) / parseFloat($scope.dailyCalories) * 100;
 	};
@@ -71,9 +108,45 @@ function TestController($scope, $location, Nutrition, Phridge) {
 			return "progress-bar-danger"
 		else if(value > 100)
 			return "progress-bar-warning"
-		else if(value < 50)
-			return "progress-bar-info"
+		else if(value < 40)
+			return "progress-bar-warning"
 		else
 			return "progress-bar-success"
 	};
+
+	$scope.colors = {
+		protein: "#FFCE54",
+		fat: "#FC6E51",
+		carbohydrates: "#A0D468"
+	};
+
+	var data = [
+	{
+		value: 26,
+		color:"#FFCE54"
+	},
+	{
+		value: 74,
+		color:"#FFE6A8"
+	},
+	{
+		value : 86,
+		color : "#A0D468"
+	},
+	{
+		value : 14,
+		color : "#B5D4A4"
+	},
+	{
+		value : 10,
+		color : "#FC6E51"
+	},
+	{
+		value : 90,
+		color : "#FCBCAA"
+	}];
+
+	new Chart(document.getElementById('intakeChart').getContext('2d')).Doughnut(data,{percentageInnerCutout: 50, segmentShowStroke: false});
+
+	$scope.info = '<h3>Welcome, ' + $scope.name + '</h3><p>Here is your progress towards today\'s daily recommended intake.</p>';
 }

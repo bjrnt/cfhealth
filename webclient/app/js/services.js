@@ -23,7 +23,7 @@ servicesModule.factory('Jsonp', function($http) {
 });
 
 servicesModule.factory('Nutrition', function($http, Jsonp) {
-	var url = "http://127.0.0.1:8080/wa?callback=JSON_CALLBACK&item=";
+	var url = "http://192.168.0.25:8080/wa?callback=JSON_CALLBACK&item=";
 	var obj = {};
 	obj.get = function (item) {
 		return Jsonp.getter(url)(item).then(function (data) {
@@ -38,7 +38,7 @@ servicesModule.factory('Nutrition', function($http, Jsonp) {
 				var match = regex.exec(plaintext);
 				while (match != null) {
 					nutrients.push({'name': match[1].trim(), 'value': match[2]});
-					match = myRegex.exec(plaintext);
+					match = regex.exec(plaintext);
 				}
 				return nutrients;
 			}
