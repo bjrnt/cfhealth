@@ -1,28 +1,24 @@
 "use strict";
 
 /* Controllers */
-
-// Personalization
-// Recommendation
-// Doughnut chart thing
-// Item != "", images for history
-
 function TestController($scope, $location, Nutrition, Phridge) {
-	$scope.date = new Date(); // Add check of date to see that it was today
-	var phridgeId = $location.search()['id'];
+	$scope.date = new Date(); // Add check to $scope.consumed of date to see that it was today
+	var phridgeId = $location.search()['id']; // Gets the fridge ID from the URL
 	$scope.dailyCalories = 2000;
 	$scope.name = "Allison";
-
-	$scope.boxClass = "";
-	//$scope.info = "Here is your progress towards today's recommended daily intake.";
+	$scope.info = '<h3>Welcome, ' + $scope.name + '</h3><p>Here is your progress towards today\'s daily recommended intake.</p>'; // Text in the info box in the upper part of the screen
+	$scope.boxClass = ""; // Sets the display class of the info box in the upper part of the screen.
+	
+	/* Main values (displayed different from the rest) and related regex to extract them */
 	var mainValues = [
 	{attr: 'protein', regex: /protein/i}, 
 	{attr: 'fat', regex: /total fat/i}, 
 	{attr: 'carbohydrates', regex: /total carbohydrates/i}, 
-	{attr: 'calories', regex:/total calories/i}];
+	{attr: 'calories', regex: /total calories/i}];
 
-	_.each(mainValues, function (value) { $scope[value.attr] = 0; });
+	_.each(mainValues, function (value) { $scope[value.attr] = 0; }); // Declares and zeroes out each main value
 
+	/* (Cleaned) list of consumed items fetched from the fridge history */
 	$scope.consumed = Phridge.history(phridgeId).then(function (items) {
 		return _.chain(items)
 		.filter(function (item) { return (item.removal != 0 && item.description != ''); })
@@ -30,6 +26,7 @@ function TestController($scope, $location, Nutrition, Phridge) {
 		.value();
 	});
 
+	/* Generates aggregates from the fetched items from the fridge couples with the Wolfram|Alpha data */
 	$scope.aggregates = function() {
 		var aggregates = {};
 		var regexes = [/protein/i, /total fat/i, /total carbohydrates/i, /total calories/i];
@@ -68,6 +65,7 @@ function TestController($scope, $location, Nutrition, Phridge) {
 		return aggregates;
 	}();
 
+	/* Not done - for recommending which item the user should take out */
 	$scope.recommend = function () {
 		$scope.info = Phridge.current(phridgeId).then(function (items) {
 			console.log(items);
@@ -103,7 +101,8 @@ function TestController($scope, $location, Nutrition, Phridge) {
 		return parseFloat(calories) / parseFloat($scope.dailyCalories) * 100;
 	};
 
-	$scope.barType = function(value) {
+	/* Sets the colors for the bars related to nutritional values */
+	$scope.barType = function (value) {
 		if(value > 130)
 			return "progress-bar-danger"
 		else if(value > 100)
@@ -146,7 +145,6 @@ function TestController($scope, $location, Nutrition, Phridge) {
 		color : "#FCBCAA"
 	}];
 
+	/* Generates the donut shaped chart */
 	new Chart(document.getElementById('intakeChart').getContext('2d')).Doughnut(data,{percentageInnerCutout: 50, segmentShowStroke: false});
-
-	$scope.info = '<h3>Welcome, ' + $scope.name + '</h3><p>Here is your progress towards today\'s daily recommended intake.</p>';
 }
