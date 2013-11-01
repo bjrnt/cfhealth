@@ -9,19 +9,19 @@
 
 <div>
 	<div class="row">
-		<div class="col-md-7 col-xs-7">
+		<div class="col-md-7 col-xs-6">
 			<div class="row" style="height: 150px">
-				<div class="col-md-12 col-xs-8 {{boxClass}}">
+				<div class="col-md-12 {{boxClass}}">
 					<p ng-bind-html-unsafe='info'></p>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-12 col-xs-8">
+				<div class="col-md-12">
 					<p class="text-center">Calories - {{ calculateCaloriesPercentage(calories) }}%</p>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-12 col-xs-8">
+				<div class="col-md-12">
 					<div class="progress">
 						  <div class="progress-bar {{ barType(calculateCaloriesPercentage(calories)) }}" role="progressbar" aria-valuenow="{{ calculateCaloriesPercentage(calories) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ calculateCaloriesPercentage(calories) }}%">
 						    <span class="sr-only">{{ calculateCaloriesPercentage(calories) }}%</span>
@@ -33,7 +33,7 @@
 		<div class="col-md-2 col-xs-3">
 			<canvas id="intakeChart" width="200" height="200"></canvas>
 		</div>
-		<div class="col-md-3">
+		<div class="col-md-3 col-xs-3">
 			<br>
 			<br>
 			<br>

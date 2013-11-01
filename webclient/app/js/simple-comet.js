@@ -26,25 +26,20 @@ window['SimpleComet'] = function() {
   function subscribe(channel,callback) {
      mychannel = channel;
      $.post(proto + '://' + server + '/comet/channels.json',{'channel_id':channel}).done(function(data) { 
-            console.log("registration: ", data);
+            //console.log("registration: ", data);
             poll(channel,callback)
      });
   }
 
   function poll(channel,callback) {
-       console.log('/comet/channels/' + channel + '.json?callback=?&since=' + since);
+       //console.log('/comet/channels/' + channel + '.json?callback=?&since=' + since);
        $.ajax(proto + '://' + server + '/comet/channels/' + channel + '.json?callback=?&since=' + since, {'success':function(data) {
-         console.log(data);
+         //console.log(data);
          if (data['since'] != 0) {
            //callback(data);
            for (var i=0;i<data.messages[channel].length;i++) {
-             try {
                 json = JSON.parse(data.messages[channel][i]['content']);
                 callback(json);
-             } catch(e) {
-                console.log("json error:");
-                console.log(e);
-             }
            }
          }
          since = data['last_id'];

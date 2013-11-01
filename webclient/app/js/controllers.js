@@ -19,18 +19,23 @@ function TestController($scope, $location, Nutrition, Phridge) {
 	_.each(mainValues, function (value) { $scope[value.attr] = 0; }); // Declares and zeroes out each main value
 
 	/* (Cleaned) list of consumed items fetched from the fridge history */
-	$scope.consumed = Phridge.history(phridgeId).then(function (items) {
-		return _.chain(items)
-		.filter(function (item) { return (item.removal != 0 && item.description != ''); })
-		.filter(function (item) { return ($scope.date - new Date(item.timein) < 1000*60*60*24); })
-		.map(function (item) { item.values = Nutrition.get(item.title); return item; })
-		.value();
-	});
+	$scope.getConsumed = function() {
+		console.log("Getting consumed...");
+		$scope.consumed = Phridge.history(phridgeId).then(function (items) {
+			return _.chain(items)
+			.filter(function (item) { return (item.removal != 0 && item.description != ''); })
+			.filter(function (item) { return ($scope.date - new Date(item.timein) < 1000*60*60*24); })
+			.map(function (item) { item.values = Nutrition.get(item.title); return item; })
+			.value();
+		});
+	};
 
 	/* Generates aggregates from the fetched items from the fridge couples with the Wolfram|Alpha data */
-	$scope.aggregates = function() {
+	$scope.getAggregates = function() {
 		var aggregates = {};
 		var regexes = [/protein/i, /total fat/i, /total carbohydrates/i, /total calories/i];
+
+		_.each(mainValues, function (value) { $scope[value.attr] = 0; });
 
 		/* Matches the value against the main values */
 		var matchMain = function (value) {
@@ -63,8 +68,13 @@ function TestController($scope, $location, Nutrition, Phridge) {
 			.each(function(item) { item.values.then(extractValues) });
 		});
 		
-		return aggregates;
-	}();
+		console.log("Getting aggregates...");
+		$scope.aggregates = {}
+		$scope.aggregates = aggregates;
+	};
+
+	$scope.getConsumed();
+	$scope.getAggregates();
 
 	/* Not done - for recommending which item the user should take out */
 	$scope.recommend = function () {
@@ -95,7 +105,7 @@ function TestController($scope, $location, Nutrition, Phridge) {
 	};
 
 	$scope.calculateCaloriesPercentage = function (calories) {
-		return parseFloat(calories) / parseFloat($scope.dailyCalories) * 100;
+		return (parseFloat(calories) / parseFloat($scope.dailyCalories) * 100);
 	};
 
 	/* Sets the colors for the bars related to nutritional values */
@@ -128,15 +138,22 @@ function TestController($scope, $location, Nutrition, Phridge) {
 
 	$scope.updateChart = function(prot, carb, fat) {
 		$scope.data[0] .value = prot;
-		$scope.data[1].value = 100-prot;
+		$scope.data[1].value = (prot > 100 ? 0 : 100 - prot);
 		$scope.data[2].value = carb;
-		$scope.data[3].value = 100-carb;
+		$scope.data[3].value = (carb > 100 ? 0 : 100 - carb);
 		$scope.data[4].value = fat;
-		$scope.data[5].value = 100-fat;
+		$scope.data[5].value = (fat > 100 ? 0 : 100 - fat);
 		return '';
 	};
 
 	SimpleComet.subscribe(phridgeId, function (json) {
-		console.log(json);
+		if(json.action == 'remove') {
+			console.log('Removal detected, refreshing data...');
+			setTimeout(function() {
+				$scope.getConsumed();
+				$scope.getAggregates();	
+			}, 1000);
+		}
 	});
+	SimpleComet.start();
 }
