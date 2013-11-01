@@ -6,24 +6,20 @@ var servicesModule = angular.module('myApp.services', []);
 
 servicesModule.value('version', '0.1');
 
-/* Fix this ugly function. Worst code you've written. Seriously.
-Also, use the getter method below */
-servicesModule.factory('Jsonp', function($http) {
+servicesModule.factory('Jsonp', function ($http) {
 	var obj = {};
 	obj.getter = function (url) {
 		return function (id) {
 			var promise = $http.jsonp(url + id).then(
-				function (response) {
-					return response.data
-				});
+			                                         function (response) { return response.data });
 			return promise;
 		};
 	};
 	return obj;
 });
 
-servicesModule.factory('Nutrition', function($http, Jsonp) {
-	var url = "http://192.168.0.25:8080/wa?callback=JSON_CALLBACK&item=";
+servicesModule.factory('Nutrition', function ($http, Jsonp) {
+	var url = "http://localhost:8080/wa?callback=JSON_CALLBACK&item=";
 	var obj = {};
 	obj.get = function (item) {
 		return Jsonp.getter(url)(item).then(function (data) {
@@ -44,7 +40,7 @@ servicesModule.factory('Nutrition', function($http, Jsonp) {
 			}
 			else {
 				// Bad request or response
-				console.log('PROBLEM EXTRACTING INFO FROM ITEM: ' + item + '. TIME TO EXPLODE!!');
+				console.log('PROBLEM EXTRACTING INFO FROM ITEM: ' + item + '.');
 			}
 			return {};
 		});
@@ -52,7 +48,7 @@ servicesModule.factory('Nutrition', function($http, Jsonp) {
 	return obj;
 });
 
-servicesModule.factory('Phridge', function($http, Jsonp) {
+servicesModule.factory('Phridge', function ($http, Jsonp) {
 	var obj = {};
 
 	obj.history = Jsonp.getter("http://pororo.kaist.ac.kr/phridge/items/?callback=JSON_CALLBACK&id=");
@@ -60,4 +56,3 @@ servicesModule.factory('Phridge', function($http, Jsonp) {
 
 	return obj;
 });
-

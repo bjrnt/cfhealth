@@ -3,25 +3,25 @@
       <h1>cfHealth <small ng-bind-template="Today ({{ date | date:'yyyy-MM-dd'}})"></small></h1>
     </div>
     <div class="col-md-4">
-    	<button ng-click="recommend()">Recommend</button>
+    	<!-- <button ng-click="recommend()">Recommend</button> -->
     </div>
 </div>
 
 <div>
 	<div class="row">
-		<div class="col-md-8 col-xs-8">
+		<div class="col-md-7 col-xs-7">
 			<div class="row" style="height: 150px">
-				<div class="col-md-10 col-xs-8 col-md-offset-1 col-xs-offset-1 {{boxClass}}">
+				<div class="col-md-12 col-xs-8 {{boxClass}}">
 					<p ng-bind-html-unsafe='info'></p>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-10 col-xs-8 col-md-offset-1 col-xs-offset-1">
+				<div class="col-md-12 col-xs-8">
 					<p class="text-center">Calories - {{ calculateCaloriesPercentage(calories) }}%</p>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-10 col-xs-8 col-md-offset-1 col-xs-offset-1">
+				<div class="col-md-12 col-xs-8">
 					<div class="progress">
 						  <div class="progress-bar {{ barType(calculateCaloriesPercentage(calories)) }}" role="progressbar" aria-valuenow="{{ calculateCaloriesPercentage(calories) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ calculateCaloriesPercentage(calories) }}%">
 						    <span class="sr-only">{{ calculateCaloriesPercentage(calories) }}%</span>
@@ -31,9 +31,9 @@
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-3">
-			<canvas id="intakeChart" width="200" height="200" style="margin-left: -80px;"></canvas>
+			<canvas id="intakeChart" width="200" height="200"></canvas>
 		</div>
-		<div class="col-md-2" style="margin-left: -80px;">
+		<div class="col-md-3">
 			<br>
 			<br>
 			<br>
@@ -45,56 +45,6 @@
 		</div>
 	</div>
 
-<!--
-	<div class="row">
-		<p class="text-center">Calories</p>
-	</div>
-	
-	<div class="row">
-		<div class="col-md-12 col-xs-12">
-			<div class="progress">
-				  <div class="progress-bar {{ barType(calculateCaloriesPercentage(calories)) }}" role="progressbar" aria-valuenow="{{ calculateCaloriesPercentage(calories) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ calculateCaloriesPercentage(calories) }}%">
-				    <span class="sr-only">{{ calculateCaloriesPercentage(calories) }}%</span>
-				  </div>
-		    </div>
-	    </div>
-	</div>
-	
-	<div class="row">
-		<div class="col-md-4 col-xs-4">
-			<p class="text-center">Protein</p>
-		</div>
-		<div class="col-md-4 col-xs-4">
-			<p class="text-center">Fat</p>
-		</div>
-		<div class="col-md-4 col-xs-4">
-			<p class="text-center">Carbs</p>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-4 col-xs-4">
-			<div class="progress">
-			  <div class="progress-bar {{ barType(protein) }}" role="progressbar" aria-valuenow="{{ protein }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ protein }}%">
-			    <span class="sr-only">{{ protein }}%</span>
-			  </div>
-		    </div>
-		</div>
-		<div class="col-md-4 col-xs-4">
-			<div class="progress">
-			  <div class="progress-bar {{ barType(fat) }}" role="progressbar" aria-valuenow="{{ fat }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ fat }}%">
-			    <span class="sr-only">{{ fat }}%</span>
-			  </div>
-		    </div>
-		</div>
-		<div class="col-md-4 col-xs-4">
-			<div class="progress">
-			  <div class="progress-bar {{ barType(carbohydrates) }}" role="progressbar" aria-valuenow="{{ carbohydrates }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ carbohydrates }}%">
-			    <span class="sr-only">{{ carbohydrates }}%</span>
-			  </div>
-		    </div>
-		</div>
-	</div>
--->
 	<hr>
 
 	<div class="row" ng-repeat="(name, value) in aggregates">
@@ -123,3 +73,5 @@
 		</li>
 	</ul>
 </div>
+
+<span>{{ updateChart(protein, carbohydrates, fat) }}</span>
