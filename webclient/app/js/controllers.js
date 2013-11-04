@@ -4,11 +4,21 @@
 function TestController($scope, $location, Nutrition, Phridge) {
 	$scope.date = new Date(); // Add check to $scope.consumed of date to see that it was today
 	var phridgeId = $location.search()['id']; // Gets the fridge ID from the URL
+	var userId = $location.search()['user'] || 'bjorn';
+
+
+	var profiles = {
+		'bjorn':{'name':'Bjorn', 
+			},
+		'thomas':{'name':'Thomas',
+			},
+	}
+
 	$scope.dailyCalories = 2000;
-	$scope.name = "Allison";
+	$scope.name = profiles[userId].name;
 	$scope.info = '<h3>Welcome, ' + $scope.name + '</h3><p>Here is your progress towards today\'s daily recommended intake.</p>'; // Text in the info box in the upper part of the screen
 	$scope.boxClass = ""; // Sets the display class of the info box in the upper part of the screen.
-	
+      	$scope.consumedHtml = "You recently consumed: ";
 	/* Main values (displayed different from the rest) and related regex to extract them */
 	var mainValues = [
 	{attr: 'protein', regex: /protein/i}, 
@@ -23,7 +33,8 @@ function TestController($scope, $location, Nutrition, Phridge) {
 		console.log("Getting consumed...");
 		$scope.consumed = Phridge.history(phridgeId).then(function (items) {
 			return _.chain(items)
-			.filter(function (item) { return (item.removal != 0 && item.description != ''); })
+			.filter(function (item) { 
+			    return (item.removal != 0 && item.title != "placeholder"); })
 			.filter(function (item) { return ($scope.date - new Date(item.timein) < 1000*60*60*24); })
 			.map(function (item) { item.values = Nutrition.get(item.title); return item; })
 			.value();
@@ -76,6 +87,9 @@ function TestController($scope, $location, Nutrition, Phridge) {
 	$scope.getConsumed();
 	$scope.getAggregates();
 
+    $scope.hideMini = ($scope.consumed == undefined || $scope.consumed.then(function(items) { return items.length == 0; }));
+    //$scope.hideMini = true;
+    
 	/* Not done - for recommending which item the user should take out */
 	$scope.recommend = function () {
 		$scope.info = Phridge.current(phridgeId).then(function (items) {
@@ -105,7 +119,7 @@ function TestController($scope, $location, Nutrition, Phridge) {
 	};
 
 	$scope.calculateCaloriesPercentage = function (calories) {
-		return (parseFloat(calories) / parseFloat($scope.dailyCalories) * 100);
+	    return (parseFloat(calories) / parseFloat($scope.dailyCalories) * 100).toFixed(1);
 	};
 
 	/* Sets the colors for the bars related to nutritional values */
@@ -134,25 +148,26 @@ function TestController($scope, $location, Nutrition, Phridge) {
 	{value : 0,color : "#FC6E51"},
 	{value : 100,color : "#FCBCAA"}];
 
-	new Chart(document.getElementById('intakeChart').getContext('2d')).Doughnut($scope.data,{percentageInnerCutout: 50, segmentShowStroke: false});
-
 	$scope.updateChart = function(prot, carb, fat) {
-		$scope.data[0] .value = prot;
+		$scope.data[0] .value = (prot > 100 ? 100 : prot);
 		$scope.data[1].value = (prot > 100 ? 0 : 100 - prot);
-		$scope.data[2].value = carb;
+		$scope.data[2].value = (carb > 100 ? 100 : carb);
 		$scope.data[3].value = (carb > 100 ? 0 : 100 - carb);
-		$scope.data[4].value = fat;
+		$scope.data[4].value = (fat > 100 ? 100 : fat);
 		$scope.data[5].value = (fat > 100 ? 0 : 100 - fat);
+        	new Chart(document.getElementById('intakeChart').getContext('2d')).Doughnut($scope.data,{percentageInnerCutout: 50, segmentShowStroke: false});
+
+	    
 		return '';
 	};
 
 	SimpleComet.subscribe(phridgeId, function (json) {
-		if(json.action == 'remove') {
+		if(json.action == 'removed') {
 			console.log('Removal detected, refreshing data...');
 			setTimeout(function() {
 				$scope.getConsumed();
 				$scope.getAggregates();	
-			}, 1000);
+			}, 100);
 		}
 	});
 	SimpleComet.start();

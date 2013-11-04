@@ -19,7 +19,7 @@ servicesModule.factory('Jsonp', function ($http) {
 });
 
 servicesModule.factory('Nutrition', function ($http, Jsonp) {
-	var url = "http://localhost:8080/wa?callback=JSON_CALLBACK&item=";
+	var url = "http://pororo.kaist.ac.kr:9696/wa?callback=JSON_CALLBACK&item=";
 	var obj = {};
 	obj.get = function (item) {
 		return Jsonp.getter(url)(item).then(function (data) {
@@ -39,7 +39,7 @@ servicesModule.factory('Nutrition', function ($http, Jsonp) {
 				return nutrients;
 			}
 			else {
-				// Bad request or response
+			    	// Bad request or response
 				console.log('PROBLEM EXTRACTING INFO FROM ITEM: ' + item + '.');
 			}
 			return {};

@@ -13,7 +13,10 @@
 			<div class="row" style="height: 150px">
 				<div class="col-md-12 {{boxClass}}">
 					<p ng-bind-html-unsafe='info'></p>
-				</div>
+<div ng-hide="hideMini"><strong class="strong" ng-bind="consumedHtml"></strong><span ng-repeat="item in consumed | orderBy:item.timein | limitTo: 3">{{ item.title.replace('%20', ' ') | lowercase}} </span>
+			
+</div>
+	</div>
 			</div>
 			<div class="row">
 				<div class="col-md-12">
@@ -65,11 +68,11 @@
 </div>
 
 <div>
-<h4 ng-bind-template="History"></h4>
+<h4>History</h4>
 	<hr>
 	<ul>
 		<li ng-repeat="item in consumed" style="text-transform: capitalize">
-			<abbr title="{{ item.values }}" class="initialism">{{ item.description.toLowerCase() }}</abbr>
+			<abbr title="{{ item.values }}" class="initialism">{{ item.title.replace('%20', ' ') }}</abbr>
 		</li>
 	</ul>
 </div>
