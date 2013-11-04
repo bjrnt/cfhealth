@@ -1,10 +1,12 @@
-<div class="page-header row">
-	<div class="col-md-8">
-      <h1>cfHealth <small ng-bind-template="Today ({{ date | date:'yyyy-MM-dd'}})"></small></h1>
-    </div>
-    <div class="col-md-4">
-    	<!-- <button ng-click="recommend()">Recommend</button> -->
-    </div>
+<div class="page-header">
+	<div class="row">
+		<div class="col-md-10">
+			<h1>cfHealth <small ng-bind-template="Today ({{ date | date:'yyyy-MM-dd'}})"></small></h1>
+		</div>
+		<div class="col-md-2">
+			<!-- <button ng-click="recommend()">Recommend</button> -->
+		</div>
+	</div>
 </div>
 
 <div>
@@ -12,11 +14,12 @@
 		<div class="col-md-7 col-xs-6">
 			<div class="row" style="height: 150px">
 				<div class="col-md-12 {{boxClass}}">
-					<p ng-bind-html-unsafe='info'></p>
-<div ng-hide="hideMini"><strong class="strong" ng-bind="consumedHtml"></strong><span ng-repeat="item in consumed | orderBy:item.timein | limitTo: 3">{{ item.title.replace('%20', ' ') | lowercase}} </span>
-			
-</div>
-	</div>
+				<p ng-bind-html-unsafe='getInfo(consumed, aggregates)'></p>
+				</div>
+				<div ng-hide="hideMini" class="col-md-12">
+				<strong class="strong" ng-bind="consumedHtml"></strong>
+				<span ng-repeat="item in consumed | orderBy:item.timein | limitTo: 3">{{ item.title.replace('%20', ' ') | lowercase}} </span>
+				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-12">
@@ -26,11 +29,11 @@
 			<div class="row">
 				<div class="col-md-12">
 					<div class="progress">
-						  <div class="progress-bar {{ barType(calculateCaloriesPercentage(calories)) }}" role="progressbar" aria-valuenow="{{ calculateCaloriesPercentage(calories) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ calculateCaloriesPercentage(calories) }}%">
-						    <span class="sr-only">{{ calculateCaloriesPercentage(calories) }}%</span>
-						  </div>
-				    </div>
-			    </div>
+						<div class="progress-bar {{ barType(calculateCaloriesPercentage(calories)) }}" role="progressbar" aria-valuenow="{{ calculateCaloriesPercentage(calories) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ calculateCaloriesPercentage(calories) }}%">
+							<span class="sr-only">{{ calculateCaloriesPercentage(calories) }}%</span>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="col-md-2 col-xs-3">
@@ -41,9 +44,9 @@
 			<br>
 			<br>
 			<ul style="list-style:none;">
-			<li><i class="icon-stop" style="color: {{ colors.protein }}"></i> Protein - {{ protein }}% </li>
-			<li><i class="icon-stop" style="color: {{ colors.carbohydrates }}"></i> Carbs - {{ carbohydrates }}% </li>
-			<li><i class="icon-stop" style="color: {{ colors.fat }}"></i> Fat - {{ fat }}%</li>
+				<li><i class="icon-stop" style="color: {{ colors.protein }}"></i> Protein - {{ protein }}% </li>
+				<li><i class="icon-stop" style="color: {{ colors.carbohydrates }}"></i> Carbs - {{ carbohydrates }}% </li>
+				<li><i class="icon-stop" style="color: {{ colors.fat }}"></i> Fat - {{ fat }}%</li>
 			</ul>
 		</div>
 	</div>
@@ -59,16 +62,16 @@
 		</div>
 		<div class="col-md-7 col-xs-11 col-xs-offset-1">
 			<div class="progress">
-			  <div class="progress-bar {{ barType(value) }}" role="progressbar" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ value }}%">
-			    <span class="sr-only">{{ value }}%</span>
-			  </div>
-		    </div>
-	    </div>
+				<div class="progress-bar {{ barType(value) }}" role="progressbar" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ value }}%">
+					<span class="sr-only">{{ value }}%</span>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
 <div>
-<h4>History</h4>
+	<h4>History</h4>
 	<hr>
 	<ul>
 		<li ng-repeat="item in consumed" style="text-transform: capitalize">
